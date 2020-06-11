@@ -23,7 +23,9 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Scanner;
 
+DECLARE @
 /**
  * This class defines a simple embedded SQL utility class that is designed to
  * work with PostgreSQL JDBC drivers.
@@ -313,7 +315,30 @@ public class Ticketmaster{
 	}//end readChoice
 	
 	public static void AddUser(Ticketmaster esql){//1
-		
+		String emails, lnames, fnames, pwds;
+		int phones;
+		Bool isCorrect = false;
+		Scanner scan = new Scanner (System.in);
+		String sqlre = "INSERT INTO Users (email , lname , fname , phone , pwd) VALUES (emails, lnames , fnames, phones, pwds)";
+
+		while (!isCorrect){
+			System.out.print("Add User: email, laastname, firstname, password, phonenumber:");
+			
+			emails = scan.nextLine();
+			lnames = scan.nextLine();
+			fnames = scan.nextLine();
+			pwds = scan.nextLine();
+			phones = scane.nextInt();
+			if(emails.length() > 64 || lnames.length() > 64 || fnames.length() > 64 || pwds.length() > 64  ){
+				System.out.print("incorrect parameters!");
+			}else{
+				SET 
+				
+				esql.executeQuery(sqlre);
+				isCorrect = true;
+				
+			}
+		}
 	}
 	
 	public static void AddBooking(Ticketmaster esql){//2
