@@ -314,32 +314,33 @@ public class Ticketmaster{
 		return input;
 	}//end readChoice
 	
-	public static void AddUser(Ticketmaster esql){//1
-		String emails, lnames, fnames, pwds;
-		int phones;
-		Bool isCorrect = false;
-		Scanner scan = new Scanner (System.in);
-		String sqlre = "INSERT INTO Users (email , lname , fname , phone , pwd) VALUES (emails, lnames , fnames, phones, pwds)";
+	public static void AddUser(Ticketmaster esql) throws Exception{//1
+                String emails, lnames, fnames, pwds;
+                emails = lnames = fnames = pwds = null;
+                int phones = 0;
+                boolean isCorrect = false;
+                Scanner scan = new Scanner (System.in);
 
-		while (!isCorrect){
-			System.out.print("Add User: email, laastname, firstname, password, phonenumber:");
-			
-			emails = scan.nextLine();
-			lnames = scan.nextLine();
-			fnames = scan.nextLine();
-			pwds = scan.nextLine();
-			phones = scane.nextInt();
-			if(emails.length() > 64 || lnames.length() > 64 || fnames.length() > 64 || pwds.length() > 64  ){
-				System.out.print("incorrect parameters!");
-			}else{
-				SET 
-				
-				esql.executeQuery(sqlre);
-				isCorrect = true;
-				
-			}
-		}
-	}
+                //String sqlre = "INSERT INTO Users (email , lname , fname , phone , pwd) VALUES ('"+emails+"', '"+lnames+"' , '"+fnames+"', '"+phones+"', '"+pwds+"')";
+
+
+                while (!isCorrect){
+                        System.out.print("Add User: email, laastname, firstname, password, phonenumber:");
+
+                        emails = scan.nextLine();
+                        lnames = scan.nextLine();
+                        fnames = scan.nextLine();
+                        pwds = scan.nextLine();
+                        phones = scan.nextInt();
+                        if(emails.length() > 64 || lnames.length() > 64 || fnames.length() > 64 || pwds.length() > 64  ){
+                                System.out.print("incorrect parameters!");
+                        }else{
+                                String sqlre = "INSERT INTO Users (email , lname , fname , phone , pwd) VALUES ('"+emails+"', '"+lnames+"' , '"+fnames+"', '"+phones+"', '"+pwds+"')";
+                                esql.executeUpdate(sqlre);
+                                isCorrect = true;
+                        }
+                }
+        }
 	
 	public static void AddBooking(Ticketmaster esql){//2
 		
@@ -369,34 +370,86 @@ public class Ticketmaster{
 		
 	}
 	
-	public static void ListTheatersPlayingShow(Ticketmaster esql){//9
-		//
-		
-	}
-	
-	public static void ListShowsStartingOnTimeAndDate(Ticketmaster esql){//10
-		//
-		
-	}
+	public static void ListTheatersPlayingShow(Ticketmaster esql) throws Exception{//9
+                //executeQueryAndReturnResult
 
-	public static void ListMovieTitlesContainingLoveReleasedAfter2010(Ticketmaster esql){//11
-		//
-		
-	}
+                int showInput = 0;
+                System.out.print("Enter a show to list all theaters playing chosen show");
+                Scanner scan = new Scanner (System.in);
 
-	public static void ListUsersWithPendingBooking(Ticketmaster esql){//12
-		//
-		
-	}
+                showInput = scan.nextInt();
+                String sqlre = "SELECT tname FROM Theaters T, Plays P WHERE T.tid = P.tid AND P.sid = '"+showInput+"'";
 
-	public static void ListMovieAndShowInfoAtCinemaInDateRange(Ticketmaster esql){//13
-		//
-		
-	}
+                System.out.print(esql.executeQueryAndReturnResult(sqlre));
+                System.out.print("QQ");
+        }
 
-	public static void ListBookingInfoForUser(Ticketmaster esql){//14
-		//
-		
-	}
+        public static void ListShowsStartingOnTimeAndDate(Ticketmaster esql) throws Exception{//10
+
+                String startTime = null;
+                String date = null;
+
+                System.out.print("Enter start time and date");
+                Scanner scan = new Scanner (System.in);
+
+                startTime = scan.nextLine();
+                date = scan.nextLine();
+
+                String sqlre = "SELECT sid FROM Shows WHERE sdate = '"+date+"' AND sttime = '"+startTime+"'";
+
+                System.out.print(esql.executeQueryAndReturnResult(sqlre));
+
+        }
+
+	public static void ListMovieTitlesContainingLoveReleasedAfter2010(Ticketmaster esql) throws Exception{//11
+                String sqlre = "SELECT title FROM Movies WHERE title LIKE '%Love%' AND rdate >= '1/1/2010'";
+                //System.out.print(esql.executeQueryAndReturnResult(sqlre));
+                esql.executeQueryAndPrintResult(sqlre);
+
+        }
+
+        public static void ListUsersWithPendingBooking(Ticketmaster esql) throws Exception{//12
+                String sqlre = "SELECT fname, lname, U.email FROM Users U, Bookings B WHERE U.email = B.email AND B.status = 'Pending'";
+
+                esql.executeQueryAndPrintResult(sqlre);
+        }
+
+        public static void ListMovieAndShowInfoAtCinemaInDateRange(Ticketmaster esql) throws Exception{//13
+                String movieU = null;
+                String cinemaU = null;
+                String sdateRange = null;
+                String edateRange = null;
+
+                System.out.print("Enter a movie, cinema, and date in that respective order");
+                Scanner scan = new Scanner (System.in);
+
+                movieU = scan.nextLine();
+                cinemaU= scan.nextLine();
+                sdateRange = scan.nextLine();
+                edateRange = scan.nextLine();
+
+                String sqlre = "SELECT m.title, m.duration AS runtime, S.sdate AS date, S.sttime AS time FROM Movies M, Cinemas C, Shows S WHERE C.cname = '"+cinemaU+"' AND m.title = '"+movieU+"'"
+         + " AND S.sdate >= '"+sdateRange+"' AND S.sdate < '"+edateRange+"'";
+
+                esql.executeQueryAndPrintResult(sqlre);
+
+
+        }
+
+
+	public static void ListBookingInfoForUser(Ticketmaster esql) throws Exception{//14
+                String userU = null;
+
+                System.out.print("Enter email");
+                Scanner scan = new Scanner (System.in);
+
+                userU = scan.nextLine();
+
+                String sqlre = "SELECT  M.title AS title , S.sdate AS date, S.sttime AS time, T.tname AS theater, CS.sno AS cinemaseatnumber  FROM  Movies M, Shows S , Theaters T, Plays P, Bookings B, CinemaSeats CS  WHERE B.email = '"+userU+"' AND B.sid = S.sid AND S.mvid = M.mvid AND P.sid = S.sid AND P.tid = T.tid AND P.tid = CS.tid ";
+
+                esql.executeQueryAndPrintResult(sqlre);
+
+        }
+
 	
 }
